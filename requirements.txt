@@ -1,5 +1,5 @@
+streamlit_analytics
 pandas==2.3.1
 plotly==6.2.0
 requests==2.32.4
 streamlit==1.48.0
-streamlit_analytics
