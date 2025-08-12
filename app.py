@@ -6,7 +6,9 @@ from datetime import datetime
 import json
 from urllib.parse import urlparse
 import os
+import streamlit_analytics
 
+streamlit_analytics.start_tracking()
 # Page configuration
 st.set_page_config(page_title="CrUX TTFB Visualizer",
                    page_icon="📊",
@@ -866,3 +868,5 @@ st.sidebar.markdown(
 # Footer
 st.markdown("---")
 st.markdown("Built for https://www.notprovided.eu • Data from Chrome UX Report")
+
+streamlit_analytics.stop_tracking()
