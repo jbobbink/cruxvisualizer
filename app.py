@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 import os
 
 # Page configuration
-st.set_page_config(page_title="CrUX TTFB Visualizer",
+st.set_page_config(page_title="CrUX Visualizer",
                    page_icon="📊",
                    layout="wide")
 
