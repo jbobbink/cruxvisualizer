@@ -866,4 +866,4 @@ st.sidebar.markdown(
 
 # Footer
 st.markdown("---")
-st.markdown("Built for [www.notprovided.eu] (https://www.notprovided.eu) • Data from Chrome UX Report")
+st.markdown("Built for https://www.notprovided.eu • Data from Chrome UX Report")
