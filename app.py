@@ -28,8 +28,8 @@ api_token = st.sidebar.text_input(
 
 # Analysis mode selection
 analysis_mode = st.sidebar.radio(
-    "Analysis Mode", ["Single Domain", "Multiple Domains"],
-    help="Choose between analyzing one domain or comparing multiple domains")
+    "Analysis Mode", ["Single Domain", "Multiple Domains / URLs"],
+    help="Choose between analyzing one domain or URL or comparing multiple domains / URLs")
 
 if analysis_mode == "Single Domain":
     # Single URL input
