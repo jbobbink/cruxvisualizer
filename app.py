@@ -85,7 +85,6 @@ available_metrics = {
     "experimental_time_to_first_byte": "TTFB (Time to First Byte)",
     "interaction_to_next_paint": "INP (Interaction to Next Paint)",
     "largest_contentful_paint": "LCP (Largest Contentful Paint)",
-    "first_paint": "FP (First Paint)",
     "first_contentful_paint": "FCP (First Contentful Paint)"
 }
 
@@ -853,7 +852,7 @@ st.sidebar.markdown("""
 - Single domain: Detailed performance analysis
 - Multiple domains: Compare up to 20 domains
 - Multi-device support: Phone, Desktop, Tablet
-- Multi-metric analysis: TTFB, INP, LCP, FP, FCP
+- Multi-metric analysis: TTFB, INP, LCP, FCP
 """)
 
 st.sidebar.markdown("---")
