@@ -104,7 +104,7 @@ collection_periods = st.sidebar.slider(
     min_value=1,
     max_value=40,
     value=25,
-    help="Number of weekly collection periods to retrieve (max 40 = ~6 months)"
+    help="Number of weekly collection periods to retrieve (max 40)"
 )
 
 
@@ -269,7 +269,7 @@ def create_metrics_chart(df, url, form_factor, data_type, selected_metrics):
         title = f'Multi-Metric Performance Trend - {data_type}: {url} ({form_factor})'
 
     fig.update_layout(title=title,
-                      xaxis_title='Collection Period End Date',
+                      xaxis_title='Collection Period End Date (28 days rolling average)',
                       yaxis_title='Performance Metrics (ms)',
                       hovermode='closest',
                       height=400,
@@ -395,7 +395,7 @@ def create_multi_domain_chart(domains_data, device_type, data_type,
         title = f'Multi-Domain Multi-Metric Comparison - {device_type} ({data_type})'
 
     fig.update_layout(title=title,
-                      xaxis_title='Collection Period End Date',
+                      xaxis_title='Collection Period End Date (28 days rolling average)',
                       yaxis_title='Performance Metrics (ms)',
                       hovermode='closest',
                       height=600,
