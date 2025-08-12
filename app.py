@@ -534,7 +534,7 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
     # Determine analysis scope
     if analysis_mode == "Multiple Domains | URLs" and len(domains_list) > 1:
         # Multi-domain analysis
-        st.info(f"🔄 Analyzing {len(domains_list)} domains...")
+        st.info(f"🔄 Analyzing {len(domains_list)} domains | URLs...")
 
         if show_all_devices:
             device_types = ["PHONE", "DESKTOP", "TABLET"]
@@ -559,7 +559,7 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
             st.error("❌ No data available for any domain or device")
             st.stop()
 
-        st.success(f"✅ Analysis complete for {len(domains_list)} domains!")
+        st.success(f"✅ Analysis complete for {len(domains_list)} domains | URLs!")
 
         # Create multi-domain comparison charts for each device
         for device in device_types:
