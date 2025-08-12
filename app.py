@@ -501,7 +501,7 @@ def display_multi_device_summary(data_dict):
 
 
 # Main application logic
-if st.sidebar.button("🔍 Analyze TTFB Performance", type="primary"):
+if st.sidebar.button("🔍 Analyze data", type="primary"):
     # Validation
     if not api_token:
         st.error("❌ Please enter your Google Cloud API key")
@@ -854,11 +854,6 @@ st.sidebar.markdown("""
 - Multiple domains: Compare up to 20 domains
 - Multi-device support: Phone, Desktop, Tablet
 - Multi-metric analysis: TTFB, INP, LCP, FP, FCP
-
-**Performance Thresholds (TTFB):**
-- Good: ≤ 800ms
-- Needs Improvement: 800ms - 1800ms  
-- Poor: > 1800ms
 """)
 
 st.sidebar.markdown("---")
