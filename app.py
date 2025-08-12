@@ -330,7 +330,7 @@ def create_combined_chart(data_dict, url, data_type, selected_metrics):
         title = f'Multi-Metric Performance Comparison - {data_type}: {url}'
 
     fig.update_layout(title=title,
-                      xaxis_title='Collection Period End Date',
+                      xaxis_title='Collection Period End Date (28 day rolling average)',
                       yaxis_title='Performance Metrics (ms)',
                       hovermode='closest',
                       height=500,
