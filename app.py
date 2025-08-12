@@ -28,10 +28,10 @@ api_token = st.sidebar.text_input(
 
 # Analysis mode selection
 analysis_mode = st.sidebar.radio(
-    "Analysis Mode", ["Single Domain", "Multiple Domains"],
+    "Analysis Mode", ["Single Domain / URL", "Multiple Domains / URLs"],
     help="Choose between analyzing one domain or comparing multiple domains")
 
-if analysis_mode == "Single Domain":
+if analysis_mode == "Single Domain / URL":
     # Single URL input
     url_input = st.sidebar.text_input(
         "Website URL or Origin",
@@ -507,7 +507,7 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
         st.stop()
 
     if not domains_list:
-        if analysis_mode == "Single Domain":
+        if analysis_mode == "Single Domain / URL":
             st.error("❌ Please enter a URL to analyze")
         else:
             st.error("❌ Please enter at least one URL to analyze")
