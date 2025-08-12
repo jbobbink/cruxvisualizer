@@ -14,7 +14,7 @@ st.set_page_config(page_title="CrUX TTFB Visualizer",
 
 st.title("📊 Chrome UX Report Visualizer")
 st.markdown(
-    "Visualize 6 months of performance data using Google's CrUX History API")
+    "Visualize performance data using Google's CrUX History API")
 
 # Sidebar for inputs
 st.sidebar.header("Configuration")
