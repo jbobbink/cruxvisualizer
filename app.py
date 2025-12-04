@@ -85,8 +85,8 @@ available_metrics = {
     "experimental_time_to_first_byte": "TTFB (Time to First Byte)",
     "interaction_to_next_paint": "INP (Interaction to Next Paint)",
     "largest_contentful_paint": "LCP (Largest Contentful Paint)",
-    "cumulative_layout_shift": "CLS (Cumulative Layout Shift)",
-    "first_contentful_paint": "FCP (First Contentful Paint)"
+    "first_contentful_paint": "FCP (First Contentful Paint)",
+    "cumulative_layout_shift": "CLS (Cumulative Layout Shift)"
 }
 
 selected_metrics = st.sidebar.multiselect(
@@ -170,6 +170,13 @@ def query_crux_history_api(api_key, url, form_factor, data_type, periods,
         return None, f"Unexpected Error: {str(e)}"
 
 
+def get_metric_unit(metric_key):
+    """Get the appropriate unit for a metric"""
+    if metric_key == "cumulative_layout_shift":
+        return ""  # CLS is unitless
+    return " ms"
+
+
 def process_crux_data(data, selected_metrics):
     """Process CrUX API response data for multiple metrics"""
     try:
@@ -236,6 +243,19 @@ def process_crux_data(data, selected_metrics):
         return None, f"Data processing error: {str(e)}"
 
 
+def get_y_axis_label(selected_metrics):
+    """Get appropriate y-axis label based on selected metrics"""
+    has_cls = "cumulative_layout_shift" in selected_metrics
+    has_time_metrics = any(m != "cumulative_layout_shift" for m in selected_metrics)
+    
+    if has_cls and has_time_metrics:
+        return "Performance Metrics (ms / CLS score)"
+    elif has_cls:
+        return "CLS Score"
+    else:
+        return "Performance Metrics (ms)"
+
+
 def create_metrics_chart(df, url, form_factor, data_type, selected_metrics):
     """Create interactive metrics time series chart"""
     fig = go.Figure()
@@ -249,6 +269,9 @@ def create_metrics_chart(df, url, form_factor, data_type, selected_metrics):
         if df[column].notna().any():  # Only add traces with data
             color = colors[i % len(colors)]
             metric_name = column.replace('_p75', '')
+            
+            # Determine unit based on metric name
+            unit = "" if "CLS" in metric_name else " ms"
 
             fig.add_trace(
                 go.Scatter(
@@ -259,7 +282,7 @@ def create_metrics_chart(df, url, form_factor, data_type, selected_metrics):
                     line=dict(color=color, width=3),
                     marker=dict(size=8, color=color),
                     hovertemplate=
-                    f'<b>Date:</b> %{{x}}<br><b>{metric_name} p75:</b> %{{y}} ms<extra></extra>'
+                    f'<b>Date:</b> %{{x}}<br><b>{metric_name} p75:</b> %{{y}}{unit}<extra></extra>'
                 ))
 
     # Determine title based on metrics
@@ -271,7 +294,7 @@ def create_metrics_chart(df, url, form_factor, data_type, selected_metrics):
 
     fig.update_layout(title=title,
                       xaxis_title='Collection Period End Date (28 days rolling average)',
-                      yaxis_title='Performance Metrics (ms)',
+                      yaxis_title=get_y_axis_label(selected_metrics),
                       hovermode='closest',
                       height=400,
                       showlegend=True)
@@ -301,6 +324,9 @@ def create_combined_chart(data_dict, url, data_type, selected_metrics):
                 if df[column].notna().any():
                     metric_name = column.replace('_p75', '')
                     device_color = device_colors[device]
+                    
+                    # Determine unit based on metric name
+                    unit = "" if "CLS" in metric_name else " ms"
 
                     # Adjust style for multiple metrics
                     line_style = dict(color=device_color, width=3)
@@ -319,7 +345,7 @@ def create_combined_chart(data_dict, url, data_type, selected_metrics):
                             line=line_style,
                             marker=dict(size=8, color=device_color),
                             hovertemplate=
-                            f'<b>Device:</b> {device}<br><b>Metric:</b> {metric_name}<br><b>Date:</b> %{{x}}<br><b>Value:</b> %{{y}} ms<extra></extra>'
+                            f'<b>Device:</b> {device}<br><b>Metric:</b> {metric_name}<br><b>Date:</b> %{{x}}<br><b>Value:</b> %{{y}}{unit}<extra></extra>'
                         ))
 
     # Determine title based on metrics
@@ -332,7 +358,7 @@ def create_combined_chart(data_dict, url, data_type, selected_metrics):
 
     fig.update_layout(title=title,
                       xaxis_title='Collection Period End Date (28 day rolling average)',
-                      yaxis_title='Performance Metrics (ms)',
+                      yaxis_title=get_y_axis_label(selected_metrics),
                       hovermode='closest',
                       height=500,
                       showlegend=True)
@@ -366,6 +392,9 @@ def create_multi_domain_chart(domains_data, device_type, data_type,
             for j, column in enumerate(metric_columns):
                 if df[column].notna().any():
                     metric_name = column.replace('_p75', '')
+                    
+                    # Determine unit based on metric name
+                    unit = "" if "CLS" in metric_name else " ms"
 
                     # Use different line styles for multiple metrics
                     line_style = dict(color=color, width=2)
@@ -384,7 +413,7 @@ def create_multi_domain_chart(domains_data, device_type, data_type,
                             line=line_style,
                             marker=dict(size=6, color=color),
                             hovertemplate=
-                            f'<b>Domain:</b> {domain_name}<br><b>Metric:</b> {metric_name}<br><b>Date:</b> %{{x}}<br><b>Value:</b> %{{y}} ms<extra></extra>'
+                            f'<b>Domain:</b> {domain_name}<br><b>Metric:</b> {metric_name}<br><b>Date:</b> %{{x}}<br><b>Value:</b> %{{y}}{unit}<extra></extra>'
                         ))
 
     # Determine title based on metrics
@@ -397,7 +426,7 @@ def create_multi_domain_chart(domains_data, device_type, data_type,
 
     fig.update_layout(title=title,
                       xaxis_title='Collection Period End Date (28 days rolling average)',
-                      yaxis_title='Performance Metrics (ms)',
+                      yaxis_title=get_y_axis_label(selected_metrics),
                       hovermode='closest',
                       height=600,
                       showlegend=True,
@@ -453,6 +482,9 @@ def display_summary_stats(df, device_name=None, selected_metrics=None):
     for column in metric_columns:
         if df[column].notna().any():
             metric_name = column.replace('_p75', '')
+            
+            # Determine unit based on metric name
+            unit = "" if "CLS" in metric_name else " ms"
 
             # Create metric row
             st.markdown(f"**{metric_name}{device_label}**")
@@ -461,28 +493,40 @@ def display_summary_stats(df, device_name=None, selected_metrics=None):
             with col1:
                 latest_val = df[column].iloc[-1]
                 if pd.notna(latest_val):
-                    st.metric("Latest", f"{latest_val:.0f} ms")
+                    if "CLS" in metric_name:
+                        st.metric("Latest", f"{latest_val:.3f}")
+                    else:
+                        st.metric("Latest", f"{latest_val:.0f}{unit}")
                 else:
                     st.metric("Latest", "N/A")
 
             with col2:
                 avg_val = df[column].mean()
                 if pd.notna(avg_val):
-                    st.metric("Average", f"{avg_val:.0f} ms")
+                    if "CLS" in metric_name:
+                        st.metric("Average", f"{avg_val:.3f}")
+                    else:
+                        st.metric("Average", f"{avg_val:.0f}{unit}")
                 else:
                     st.metric("Average", "N/A")
 
             with col3:
                 min_val = df[column].min()
                 if pd.notna(min_val):
-                    st.metric("Best", f"{min_val:.0f} ms")
+                    if "CLS" in metric_name:
+                        st.metric("Best", f"{min_val:.3f}")
+                    else:
+                        st.metric("Best", f"{min_val:.0f}{unit}")
                 else:
                     st.metric("Best", "N/A")
 
             with col4:
                 max_val = df[column].max()
                 if pd.notna(max_val):
-                    st.metric("Worst", f"{max_val:.0f} ms")
+                    if "CLS" in metric_name:
+                        st.metric("Worst", f"{max_val:.3f}")
+                    else:
+                        st.metric("Worst", f"{max_val:.0f}{unit}")
                 else:
                     st.metric("Worst", "N/A")
 
@@ -598,8 +642,10 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
                             ).any() else None
 
                             if latest_val is not None:
-                                row_data[
-                                    f'{metric_name} Latest (ms)'] = f"{latest_val:.0f}"
+                                if "CLS" in metric_name:
+                                    row_data[f'{metric_name} Latest'] = f"{latest_val:.3f}"
+                                else:
+                                    row_data[f'{metric_name} Latest (ms)'] = f"{latest_val:.0f}"
 
                                 # Performance classification for TTFB only
                                 if 'TTFB' in metric_name:
@@ -610,10 +656,21 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
                                             'TTFB Status'] = "🟡 Needs Improvement"
                                     else:
                                         row_data['TTFB Status'] = "🔴 Poor"
+                                
+                                # Performance classification for CLS
+                                if 'CLS' in metric_name:
+                                    if latest_val <= 0.1:
+                                        row_data['CLS Status'] = "🟢 Good"
+                                    elif latest_val <= 0.25:
+                                        row_data['CLS Status'] = "🟡 Needs Improvement"
+                                    else:
+                                        row_data['CLS Status'] = "🔴 Poor"
 
                             if avg_val is not None:
-                                row_data[
-                                    f'{metric_name} Average (ms)'] = f"{avg_val:.0f}"
+                                if "CLS" in metric_name:
+                                    row_data[f'{metric_name} Average'] = f"{avg_val:.3f}"
+                                else:
+                                    row_data[f'{metric_name} Average (ms)'] = f"{avg_val:.0f}"
 
                     summary_data.append(row_data)
 
@@ -735,6 +792,27 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
                                 f"🔴 {device}: Poor TTFB performance (> 1800ms)"
                             )
 
+                # Performance classification for CLS if present
+                cls_column = None
+                for col in df.columns:
+                    if 'CLS' in col:
+                        cls_column = col
+                        break
+
+                if cls_column and df[cls_column].notna().any():
+                    latest_cls = df[cls_column].iloc[-1]
+                    if pd.notna(latest_cls):
+                        if latest_cls <= 0.1:
+                            st.success(
+                                f"🟢 {device}: Good CLS performance (≤ 0.1)")
+                        elif latest_cls <= 0.25:
+                            st.warning(
+                                f"🟡 {device}: CLS needs improvement (0.1 - 0.25)"
+                            )
+                        else:
+                            st.error(
+                                f"🔴 {device}: Poor CLS performance (> 0.25)")
+
                 st.markdown("---")
 
             # Combined raw data
@@ -797,11 +875,18 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
                         metric_name = column.replace('_p75', '')
                         recent_trend = df[column].iloc[-5:].mean(
                         ) - df[column].iloc[-10:-5].mean()
-                        if recent_trend > 50:
+                        
+                        # Adjust threshold for CLS (much smaller values)
+                        if "CLS" in metric_name:
+                            threshold = 0.02
+                        else:
+                            threshold = 50
+                            
+                        if recent_trend > threshold:
                             st.warning(
                                 f"📈 {metric_name} has increased significantly in recent periods"
                             )
-                        elif recent_trend < -50:
+                        elif recent_trend < -threshold:
                             st.success(
                                 f"📉 {metric_name} has improved significantly in recent periods"
                             )
@@ -828,6 +913,23 @@ if st.sidebar.button("🔍 Analyze data", type="primary"):
                         else:
                             st.error("🔴 Poor TTFB performance (> 1800ms)")
 
+                # Performance classification for CLS
+                cls_column = None
+                for col in df.columns:
+                    if 'CLS' in col:
+                        cls_column = col
+                        break
+
+                if cls_column and df[cls_column].notna().any():
+                    latest_cls = df[cls_column].iloc[-1]
+                    if pd.notna(latest_cls):
+                        if latest_cls <= 0.1:
+                            st.success("🟢 Good CLS performance (≤ 0.1)")
+                        elif latest_cls <= 0.25:
+                            st.warning("🟡 CLS needs improvement (0.1 - 0.25)")
+                        else:
+                            st.error("🔴 Poor CLS performance (> 0.25)")
+
                 # Raw data table
                 with st.expander("📋 View Raw Data"):
                     st.dataframe(df.sort_values('date', ascending=False),
@@ -853,7 +955,7 @@ st.sidebar.markdown("""
 - Single domain | URL: Detailed performance analysis
 - Multiple domains | URL: Compare up to 20 domains or URLs
 - Multi-device support: Phone, Desktop, Tablet
-- Multi-metric analysis: TTFB, INP, LCP, FCP
+- Multi-metric analysis: TTFB, INP, LCP, FCP, CLS
 """)
 
 st.sidebar.markdown("---")
