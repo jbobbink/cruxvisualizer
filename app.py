@@ -85,6 +85,7 @@ available_metrics = {
     "experimental_time_to_first_byte": "TTFB (Time to First Byte)",
     "interaction_to_next_paint": "INP (Interaction to Next Paint)",
     "largest_contentful_paint": "LCP (Largest Contentful Paint)",
+    "cumulative_layout_shift": "CLS (Cumulative Layout Shift)",
     "first_contentful_paint": "FCP (First Contentful Paint)"
 }
 
