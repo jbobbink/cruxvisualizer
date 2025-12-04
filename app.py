@@ -217,7 +217,11 @@ def process_crux_data(data, selected_metrics):
                 values = []
                 for i, p75_val in enumerate(p75_values):
                     if i < len(dates) and p75_val is not None:
-                        values.append(p75_val)
+                        # Convert string values to float (CLS comes as strings)
+                        try:
+                            values.append(float(p75_val))
+                        except (ValueError, TypeError):
+                            values.append(None)
                     else:
                         values.append(None)
 
